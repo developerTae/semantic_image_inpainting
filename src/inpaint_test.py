@@ -85,7 +85,7 @@ def loadmask(filename, thresh=128):
     image_shape = [args.imgSize, args.imgSize]
     mask = np.ones(image_shape)
     mask[immask < 128] = 0
-    mask[immaks >= 128] = 1
+    mask[immask >= 128] = 1
     return mask
 
 

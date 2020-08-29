@@ -1,3 +1,4 @@
+# 파이썬 모듈 불러들이기
 import tensorflow as tf
 import scipy.misc
 import argparse
@@ -8,6 +9,7 @@ from glob import glob
 from model_inpaint import ModelInpaint
 from helper import loadimage, saveimages
 
+# ArgumentParser
 parser = argparse.ArgumentParser()
 parser.add_argument('--model_file', type=str, help="Pretrained GAN model")
 parser.add_argument('--lr', type=float, default=0.0003)
@@ -55,7 +57,7 @@ args = parser.parse_args()
 #        filename = os.path.join(args.outDir, filename)
 #        scipy.misc.imsave(filename, outimages[i, :, :, :])
 
-
+# 마스크 생성
 def gen_mask(maskType):
     image_shape = [args.imgSize, args.imgSize]
     if maskType == 'random':
@@ -86,10 +88,10 @@ def loadmask(filename, thresh=128):
     image_shape = [args.imgSize, args.imgSize]
     mask = np.ones(image_shape)
     mask[immask < 128] = 0
-    mask[immaks >= 128] = 1
+    mask[immask >= 128] = 1
     return mask
 
-
+# Main 메서드 정의
 def main():
     m = ModelInpaint(args.model_file, args)
 
@@ -102,7 +104,7 @@ def main():
         imgfilenames = glob( args.inDir + '/*.' + args.imgExt )
         print('{} images found'.format(len(imgfilenames)))
         in_img = np.array([loadimage(f) for f in imgfilenames])
-    elif args.in_img is not None:
+    elif args.in_image is not None:
         in_img = loadimage(args.in_image)
     else:
         print('Input image needs to be specified')

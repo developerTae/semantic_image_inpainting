@@ -60,6 +60,7 @@ class ModelInpaint():
         sample_out = self.sess.run(self.go, feed_dict={self.gi: z})
         return sample_out
 
+    # 전처리
     def preprocess(self, images, imask, useWeightedMask = True, nsize=7):
         """Default preprocessing pipeline
         Prepare the data to be fed to the network. Weighted mask is computed
@@ -100,6 +101,7 @@ class ModelInpaint():
             ncpy = min(num_images, self.batch_size)
             self.images_data[:ncpy, :, :, :] = images[:ncpy, :, :, :].copy()
 
+    # 후처리 (Poisson Blending)
     def postprocess(self, g_out, blend = True):
         """Default post processing pipeline
         Applies poisson blending using binary mask. (default)
@@ -131,13 +133,16 @@ class ModelInpaint():
             self.images = tf.placeholder(tf.float32,
                                          [None] + self.image_shape,
                                          name='images')
+            # Context loss은 GAN의 G와 손상되지 않은 original image 간의 L2 norm을 이용해 구한다.
             self.context_loss = tf.reduce_sum(
                     tf.contrib.layers.flatten(
                         tf.abs(tf.multiply(self.masks, self.go) -
                                tf.multiply(self.masks, self.images))), 1
                 )
 
+            # Peceptual loss는 PSNR은 낮더라도 사람이 보기에 이상하지 않게 fine texture 정보를 잘 복원할 수 있게한다.
             self.perceptual_loss = self.gl
+            # Inpaint Loss = Context Loss + Perceptual Loss
             self.inpaint_loss = self.context_loss + self.l*self.perceptual_loss
             self.inpaint_grad = tf.gradients(self.inpaint_loss, self.gi)
 
@@ -162,6 +167,7 @@ class ModelInpaint():
 
         return self.postprocess(imout, blend), imout
 
+    # 역전파 처리 메서드 정의
     def backprop_to_input(self, verbose=True):
         """Main worker function. To be called after all initilization is done.
         Performs backpropagation to input using (accelerated) gradient descent
@@ -190,6 +196,7 @@ class ModelInpaint():
 
         return imout
 
+    # Load pretrained DCGAN model
     @staticmethod
     def loadpb(filename, model_name='dcgan'):
         """Loads pretrained graph from ProtoBuf file

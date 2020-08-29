@@ -4,6 +4,7 @@
 #
 # Original code from https://github.com/parosky/poissonblending 
 
+# 파이썬 모듈 불러들이기
 import numpy as np
 import scipy.sparse
 import PIL.Image

@@ -1,3 +1,4 @@
+# 파이썬 모듈 불러들이기
 import tensorflow as tf
 import numpy as np
 import external.poissonblending as blending
@@ -5,6 +6,7 @@ from scipy.signal import convolve2d
 
 
 class ModelInpaint():
+    # 파라미터 초기화 함수 정의
     def __init__(self, modelfilename, config,
                  model_name='dcgan',
                  gen_input='z:0', gen_output='Tanh:0', gen_loss='Mean_2:0',
